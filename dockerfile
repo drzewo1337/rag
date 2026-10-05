@@ -16,7 +16,9 @@ WORKDIR /app
 COPY --from=builder /venv /venv
 ENV PATH="/venv/bin:$PATH"
 
-COPY rag_service/facts_controller.py .
+COPY database/facts_controller.py .
+COPY database/models.py .
+COPY database/database.py .
 
 EXPOSE 8000
 
