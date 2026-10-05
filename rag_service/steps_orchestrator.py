@@ -1,26 +1,11 @@
 import ollama
-from dataset_loader import dataset
 import json
 from cosine_sim import cosine_similarity
 
 EMBEDDING_MODEL = 'hf.co/CompendiumLabs/bge-base-en-v1.5-gguf'
 LANGUAGE_MODEL = 'hf.co/bartowski/Llama-3.2-1B-Instruct-GGUF'
 
-database = []
-
-def add_to_database(line):
-    embedding = ollama.embed(model=EMBEDDING_MODEL, input=line)['embeddings'][0]
-    with open('database.json', 'w') as file:
-        database.append((line, embedding))
-        json.dump(database, file)
-
-for line in dataset:
-    add_to_database(line)
-
-def read_database():
-    with open('database.json', 'r') as file:
-        database = json.load(file)
-    return database
+# TODO: add read facts from database
 
 def retrieve(query, top_n=3):
   query_embedding = ollama.embed(model=EMBEDDING_MODEL, input=query)['embeddings'][0]

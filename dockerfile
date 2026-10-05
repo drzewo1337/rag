@@ -16,11 +16,10 @@ WORKDIR /app
 COPY --from=builder /venv /venv
 ENV PATH="/venv/bin:$PATH"
 
-COPY database/facts_controller.py .
-COPY database/models.py .
-COPY database/database.py .
+# Keep the same folder layout as in the repo so Python package imports work.
+COPY database ./database
+COPY rag_service ./rag_service
 
 EXPOSE 8000
 
-# run the application
-CMD ["uvicorn", "facts_controller:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "database.facts_controller:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
