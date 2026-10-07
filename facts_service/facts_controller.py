@@ -7,6 +7,7 @@ from rag_service.embedding import embed
 from facts_service import models
 from facts_service.database import SessionLocal, engine
 from sqlalchemy.orm import Session
+from datetime import datetime
 
 
 @asynccontextmanager
@@ -20,7 +21,7 @@ async def lifespan(app: FastAPI):
             dataset = load_dataset()
             for fact in dataset:
                 embedding = embed(fact)
-                db_fact = models.Facts(fact_text=fact, embedding=str(embedding))
+                db_fact = models.Facts(fact_text=fact, embedding=str(embedding), created_at=datetime.now())
                 db.add(db_fact)
                 db.commit()
             print("Wczytano fakty do bazy danych")
@@ -57,7 +58,7 @@ class AnswerCreate(BaseModel):
 
 @app.post("/facts")
 async def create_fact(fact: FactCreate, db: db_dependency):
-    db_fact = models.Facts(fact_text=fact.fact_text)
+    db_fact = models.Facts(fact_text=fact.fact_text, created_at=datetime.now())
     db.add(db_fact)
     db.commit()
     return {"message": "Fact created successfully", "fact": db_fact}

@@ -6,7 +6,7 @@ from typing import Annotated
 from ask_reponse_service import models
 from ask_reponse_service.database import SessionLocal, engine
 from sqlalchemy.orm import Session
-
+from datetime import datetime
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -39,7 +39,7 @@ class AnswerCreate(BaseModel):
 
 @app.post("/questions")
 async def create_question(question: QuestionCreate, db: db_dependency):
-    db_question = models.Questions(question_text=question.question_text)
+    db_question = models.Questions(question_text=question.question_text, created_at=datetime.now())
     db.add(db_question)
     db.commit()
     return {"message": "Question created successfully", "question": db_question}
@@ -47,7 +47,7 @@ async def create_question(question: QuestionCreate, db: db_dependency):
 
 @app.post("/answers")
 async def create_answer(answer: AnswerCreate, db: db_dependency):
-    db_answer = models.Answers(answer_text=answer.answer_text, question_id=answer.question_id)
+    db_answer = models.Answers(answer_text=answer.answer_text, question_id=answer.question_id, created_at=datetime.now())
     db.add(db_answer)
     db.commit()
     return {"message": "Answer created successfully", "answer": db_answer}
