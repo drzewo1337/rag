@@ -53,6 +53,9 @@ services:
     build:
       context: .
       dockerfile: rag_service/dockerfile
+    depends_on:
+      database:
+        condition: service_healthy
     command:
       [
         "uvicorn",
@@ -98,8 +101,6 @@ services:
       - 8000:8000
     depends_on:
       database:
-        condition: service_healthy
-      ask_response_service:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql://postgres:postgres@database:5432/rag_service_db
