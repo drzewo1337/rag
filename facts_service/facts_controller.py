@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import Annotated
 from contextlib import asynccontextmanager
 from facts_service.dataset_loader import load_dataset
-from rag_service.embedding import embed
+from facts_service.embedding import embed
 from facts_service import models
 from facts_service.database import SessionLocal, engine
 from sqlalchemy.orm import Session

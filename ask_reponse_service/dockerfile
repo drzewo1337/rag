@@ -15,11 +15,8 @@ WORKDIR /app
 COPY --from=builder /venv /venv
 ENV PATH="/venv/bin:$PATH"
 
-COPY facts_service ./facts_service
-COPY rag_service ./rag_service
 COPY ask_reponse_service ./ask_reponse_service
 
-EXPOSE 8000 8001
+EXPOSE 8001
 
-# Default app; override per service in docker-compose.yaml
-CMD ["uvicorn", "facts_service.facts_controller:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "ask_reponse_service.ask_reponse_controller:app", "--host", "0.0.0.0", "--port", "8001"]

@@ -15,9 +15,11 @@ services:
       timeout: 5s
       retries: 10
 
+
   ask_response_service:
     build:
       context: .
+      dockerfile: ask_reponse_service/dockerfile
     command:
       [
         "uvicorn",
@@ -46,9 +48,42 @@ services:
       retries: 10
       start_period: 15s
 
+
+  rag_service:
+    build:
+      context: .
+      dockerfile: rag_service/dockerfile
+    command:
+      [
+        "uvicorn",
+        "rag_service.rag_controller:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8002",
+        "--reload",
+      ]
+    ports:
+      - 8002:8002
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@database:5432/rag_service_db
+      OLLAMA_HOST: http://host.docker.internal:11434
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'python -c "import urllib.request; urllib.request.urlopen(''http://127.0.0.1:8002/health'', timeout=2)"',
+        ]
+      interval: 5s
+      timeout: 60s
+      retries: 10
+      start_period: 15s
+
+
   facts_service:
     build:
       context: .
+      dockerfile: facts_service/dockerfile
     command:
       [
         "uvicorn",
@@ -79,6 +114,7 @@ services:
       timeout: 60s
       retries: 30
       start_period: 300s
+
 
 volumes:
   database_data:

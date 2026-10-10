@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
-from facts_service.database import Base
+from ask_reponse_service.database import Base
 from datetime import datetime
 
 class Questions(Base):
