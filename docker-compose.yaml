@@ -1,3 +1,15 @@
+networks:
+  rag_service_network: 
+    driver: bridge
+
+volumes:
+  database_data:
+  rabbitmq_data:
+
+configs:
+  rabbitmq-plugins:
+    content: "[rabbitmq_management]."
+
 services:
   database:
     image: postgres:17-alpine
@@ -14,7 +26,35 @@ services:
       interval: 2s
       timeout: 5s
       retries: 10
+    networks:
+      - rag_service_network
 
+
+  rabbitmq:
+    image: rabbitmq:4.3.6-management-alpine
+    ports:
+      - 15672:15672
+      - 5672:5672
+    restart: always
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    networks:
+      - rag_service_network
+    configs:
+      - source: rabbitmq-plugins
+        target: /etc/rabbitmq/enabled_plugins
+    env_file:
+      - .env
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBIT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBIT_PASSWORD}
+      RABBITMQ_DEFAULT_VHOST: ${RABBIT_VHOST}
 
   ask_response_service:
     build:
@@ -35,8 +75,13 @@ services:
     depends_on:
       database:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    env_file:
+      - .env
     environment:
       DATABASE_URL: postgresql://postgres:postgres@database:5432/rag_service_db
+      RABBIT_HOST: rabbitmq
     healthcheck:
       test:
         [
@@ -47,6 +92,8 @@ services:
       timeout: 60s
       retries: 10
       start_period: 15s
+    networks:
+      - rag_service_network
 
 
   rag_service:
@@ -55,6 +102,10 @@ services:
       dockerfile: rag_service/dockerfile
     depends_on:
       database:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      ask_response_service:
         condition: service_healthy
     command:
       [
@@ -68,9 +119,13 @@ services:
       ]
     ports:
       - 8002:8002
+    env_file:
+      - .env
     environment:
       DATABASE_URL: postgresql://postgres:postgres@database:5432/rag_service_db
       OLLAMA_HOST: http://host.docker.internal:11434
+      RABBIT_HOST: rabbitmq
+      ASK_RESPONSE_SERVICE_URL: http://ask_response_service:8001
     healthcheck:
       test:
         [
@@ -81,6 +136,10 @@ services:
       timeout: 60s
       retries: 10
       start_period: 15s
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - rag_service_network
 
 
   facts_service:
@@ -115,7 +174,5 @@ services:
       timeout: 60s
       retries: 30
       start_period: 300s
-
-
-volumes:
-  database_data:
+    networks: 
+      - rag_service_network

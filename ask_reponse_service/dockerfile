@@ -15,6 +15,7 @@ WORKDIR /app
 COPY --from=builder /venv /venv
 ENV PATH="/venv/bin:$PATH"
 
+COPY messaging ./messaging
 COPY ask_reponse_service ./ask_reponse_service
 
 EXPOSE 8001

@@ -16,6 +16,7 @@ COPY --from=builder /venv /venv
 ENV PATH="/venv/bin:$PATH"
 
 COPY facts_service ./facts_service
+COPY embedding ./embedding
 
 EXPOSE 8000
 
