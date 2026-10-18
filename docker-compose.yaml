@@ -5,6 +5,7 @@ networks:
 volumes:
   database_data:
   rabbitmq_data:
+  frontend_node_modules:
 
 configs:
   rabbitmq-plugins:
@@ -175,4 +176,17 @@ services:
       retries: 30
       start_period: 300s
     networks: 
+      - rag_service_network
+
+  frontend:
+    build:
+      context: frontend/rag
+      dockerfile: dockerfile
+      target: dev
+    ports:
+      - 5173:5173
+    volumes:
+      - ./frontend/rag:/app
+      - frontend_node_modules:/app/node_modules
+    networks:
       - rag_service_network
