@@ -8,13 +8,25 @@ function QuestionAnswerApp() {
     console.log(question);
   }
 
-  return (  
+  return (
     <div className="question-answer">
-      <h1>Question Answer</h1>
-      <form onSubmit={handleSubmit}>
-        <input type="text" placeholder="Enter your question" name="question" />
-        <button type="submit">Answer</button>
-      </form>
+      <h1>Question and answer</h1>
+      <div className="question-answer-panel">
+        <form className="question-answer-form" onSubmit={handleSubmit}>
+          <input
+            className="question-answer-input"
+            type="text"
+            placeholder="Enter your question"
+            name="question"
+          />
+          <button type="submit" className="question-answer-submit">
+            Ask
+          </button>
+        </form>
+        <div className="question-answer-response" aria-live="polite">
+          <p className="question-answer-response-empty">Answer will appear here.</p>
+        </div>
+      </div>
     </div>
   )
 }
