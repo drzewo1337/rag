@@ -2,43 +2,72 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 16px;
-    min-height: 100%;
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    background-color: #222;
 }
 
 .question-answer h1 {
     margin: 0;
-    font-size: 1.75rem;
+    padding: 16px 24px 0;
+    font-size: 1rem;
+    font-weight: 600;
     line-height: 1.2;
-    color: #fff;
+    color: #ddd;
 }
 
 .question-answer-panel {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding: 12px 16px;
-    background-color: #444;
-    border: 1px solid #555;
-    border-radius: 15px;
+    flex: 0 0 auto;
+    margin-top: auto;
     box-sizing: border-box;
+}
+
+.question-answer-response {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    margin: 16px auto 0;
+    width: min(720px, calc(100% - 48px));
+    padding: 24px 8px;
+    color: #ccc;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+.question-answer-response-empty {
+    margin: 0;
+    color: #888;
+    text-align: center;
 }
 
 .question-answer-form {
     display: flex;
     flex-direction: row;
-    align-items: stretch;
+    align-items: center;
     gap: 12px;
-    width: 100%;
+    width: min(720px, calc(100% - 48px));
+    margin: 0 auto 24px;
+    padding: 10px 12px;
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 24px;
+    box-sizing: border-box;
 }
 
 .question-answer-input {
     flex: 1;
     min-width: 0;
-    padding: 10px 12px;
-    border: 1px solid #666;
+    padding: 8px 4px;
+    border: none;
     border-radius: 8px;
-    background-color: #333;
+    background-color: transparent;
     color: #fff;
     font-size: 0.95rem;
     box-sizing: border-box;
@@ -49,16 +78,18 @@
 }
 
 .question-answer-input:focus-visible {
-    outline: 2px solid #999;
-    outline-offset: 0;
-    border-color: #888;
+    outline: none;
+}
+
+.question-answer-form:focus-within {
+    border-color: #777;
 }
 
 .question-answer-submit {
     flex-shrink: 0;
     padding: 8px 14px;
     border: none;
-    border-radius: 8px;
+    border-radius: 16px;
     background-color: #5a5a5a;
     color: #fff;
     font-size: 0.9rem;
@@ -73,21 +104,4 @@
 .question-answer-submit:focus-visible {
     outline: 2px solid #999;
     outline-offset: 2px;
-}
-
-.question-answer-response {
-    min-height: 160px;
-    padding: 16px;
-    background-color: #3a3a3a;
-    border: 1px dashed #666;
-    border-radius: 12px;
-    color: #ccc;
-    font-size: 0.95rem;
-    line-height: 1.45;
-    box-sizing: border-box;
-}
-
-.question-answer-response-empty {
-    margin: 0;
-    color: #888;
 }

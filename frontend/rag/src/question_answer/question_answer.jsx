@@ -11,6 +11,9 @@ function QuestionAnswerApp() {
   return (
     <div className="question-answer">
       <h1>Question and answer</h1>
+      <div className="question-answer-response" aria-live="polite">
+          <p className="question-answer-response-empty">Answer will appear here.</p>
+        </div>
       <div className="question-answer-panel">
         <form className="question-answer-form" onSubmit={handleSubmit}>
           <input
@@ -23,9 +26,6 @@ function QuestionAnswerApp() {
             Ask
           </button>
         </form>
-        <div className="question-answer-response" aria-live="polite">
-          <p className="question-answer-response-empty">Answer will appear here.</p>
-        </div>
       </div>
     </div>
   )
