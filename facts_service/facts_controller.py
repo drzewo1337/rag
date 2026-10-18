@@ -56,6 +56,18 @@ class AnswerCreate(BaseModel):
     question_id: int
 
 
+@app.get("/facts")
+async def list_facts(db: db_dependency):
+    db_facts = db.query(models.Facts).order_by(models.Facts.id.desc()).all()
+    return {
+        "count": len(db_facts),
+        "facts": [
+            {"id": fact.id, "fact_text": fact.fact_text, "created_at": fact.created_at}
+            for fact in db_facts
+        ],
+    }
+
+
 @app.post("/facts")
 async def create_fact(fact: FactCreate, db: db_dependency):
     db_fact = models.Facts(fact_text=fact.fact_text, created_at=datetime.now())
