@@ -59,3 +59,11 @@ database.json
 
 /rag/
 fakty
+
+frontend/node_modules
+frontend/rag/node_modules
+frontend/package-lock.json
+frontend/rag/package-lock.json
+frontend/package.json
+docker-compose.yaml
+docker-compose.yaml
