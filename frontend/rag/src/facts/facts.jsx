@@ -2,11 +2,11 @@ import './facts.css'
 import { useDropzone } from 'react-dropzone'
 import { useCallback, useState } from 'react'
 import { fetchFacts, uploadFactsFromFile } from '../api/factsApi'
+import { IconDatabase, IconRefresh, IconUpload } from '../icons'
 
 function FactsApp() {
   return (
     <div className="facts">
-      <h1>Facts manager</h1>
       <div className="facts-manager">
         <Upload />
         <FactsList />
@@ -45,22 +45,35 @@ function Upload() {
   })
 
   return (
-    <div>
+    <div className="facts-upload-wrap">
       <div
         {...getRootProps({
-          className: `facts-upload cyber-chamfer${isDragActive ? ' facts-upload-active' : ''}`,
+          className: `facts-upload${isDragActive ? ' facts-upload-active' : ''}`,
         })}
       >
         <input {...getInputProps()} />
-        <p className="facts-upload-label">
-          {uploading
-            ? 'Uploading...'
-            : isDragActive
-              ? 'Drop file here'
-              : 'Upload your facts'}
-        </p>
+        <span className="facts-upload-icon" aria-hidden="true">
+          <IconUpload width={22} height={22} />
+        </span>
+        <div className="facts-upload-copy">
+          <p className="facts-upload-label">
+            {uploading ? 'Uploading…' : 'Upload documents'}
+          </p>
+          <p className="facts-upload-hint">
+            {isDragActive
+              ? 'Drop your file here'
+              : 'Drag and drop or click to browse'}
+          </p>
+        </div>
       </div>
-      {uploadMessage ? <p className="facts-upload-status">{uploadMessage}</p> : null}
+      {uploadMessage ? (
+        <p
+          className={`facts-upload-status${uploadMessage.includes('failed') || uploadMessage.includes('empty') ? ' facts-upload-status-error' : ''}`}
+          role="status"
+        >
+          {uploadMessage}
+        </p>
+      ) : null}
     </div>
   )
 }
@@ -85,17 +98,30 @@ function FactsList() {
   }
 
   return (
-    <div className="facts-list cyber-chamfer">
-      <p className="facts-count">Facts count: {factsCount}</p>
-      {error ? <p className="facts-error">{error}</p> : null}
-      <button
-        type="button"
-        className="facts-refresh cyber-btn cyber-chamfer-sm"
-        onClick={refreshFactsCount}
-        disabled={loading}
-      >
-        {loading ? 'Loading...' : 'Refresh'}
-      </button>
+    <div className="facts-kb">
+      <div className="facts-kb-header">
+        <span className="facts-kb-icon" aria-hidden="true">
+          <IconDatabase width={18} height={18} />
+        </span>
+        <span className="facts-kb-label">Knowledge Base</span>
+        <button
+          type="button"
+          className="facts-refresh"
+          onClick={refreshFactsCount}
+          disabled={loading}
+          aria-label="Refresh knowledge base count"
+          title="Refresh"
+        >
+          <IconRefresh width={18} height={18} />
+        </button>
+      </div>
+      <p className="facts-count">
+        <span className="facts-count-value">{factsCount}</span>
+        <span className="facts-count-unit">
+          {factsCount === 1 ? 'fact' : 'facts'}
+        </span>
+      </p>
+      {error ? <p className="facts-error" role="alert">{error}</p> : null}
     </div>
   )
 }

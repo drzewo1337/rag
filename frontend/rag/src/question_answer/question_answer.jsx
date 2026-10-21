@@ -1,15 +1,26 @@
 import './question_answer.css'
 import { useEffect, useRef, useState } from 'react'
 import { askQuestionAndWaitForAnswer } from '../api/askApi'
+import { IconPanelLeft, IconSend } from '../icons'
 
-function QuestionAnswerApp() {
+function QuestionAnswerApp({ onOpenSidebar }) {
   const [exchanges, setExchanges] = useState([])
   const [loading, setLoading] = useState(false)
   const messagesEndRef = useRef(null)
+  const textareaRef = useRef(null)
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [exchanges, loading])
+
+  const resizeTextarea = () => {
+    const el = textareaRef.current
+    if (!el) {
+      return
+    }
+    el.style.height = 'auto'
+    el.style.height = `${Math.min(el.scrollHeight, 160)}px`
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -27,6 +38,7 @@ function QuestionAnswerApp() {
     ])
     setLoading(true)
     form.reset()
+    resizeTextarea()
 
     try {
       const answerText = await askQuestionAndWaitForAnswer(question)
@@ -54,64 +66,112 @@ function QuestionAnswerApp() {
     }
   }
 
-  const showPlaceholder = exchanges.length === 0 && !loading
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      e.currentTarget.form?.requestSubmit()
+    }
+  }
+
+  const showWelcome = exchanges.length === 0 && !loading
 
   return (
-    <div className="question-answer">
-      <h1>Question and answer</h1>
-      <div className="question-answer-response" aria-live="polite">
-        <div className="question-answer-messages">
-          {showPlaceholder ? (
-            <p className="question-answer-response-empty">Answer will appear here.</p>
-          ) : null}
-          {exchanges.map((item) => (
-            <article key={item.id} className="question-answer-exchange">
-              <p className="question-answer-message question-answer-message-user">
-                <span className="question-answer-message-label">You</span>
-                {item.question}
+    <main className="question-answer">
+      <div className="question-answer-toolbar">
+        <button
+          type="button"
+          className="question-answer-menu"
+          onClick={onOpenSidebar}
+          aria-label="Open knowledge base sidebar"
+        >
+          <IconPanelLeft width={20} height={20} />
+        </button>
+      </div>
+
+      <div className="question-answer-scroll" aria-live="polite">
+        <div className="question-answer-inner">
+          {showWelcome ? (
+            <div className="question-answer-welcome">
+              <h1 className="question-answer-welcome-title">
+                How can I help you today?
+              </h1>
+              <p className="question-answer-welcome-desc">
+                Ask questions and explore knowledge from your documents.
               </p>
-              {item.status === 'pending' ? (
-                <p className="question-answer-message question-answer-message-assistant question-answer-response-loading">
-                  <span className="question-answer-message-label">RAG</span>
-                  Generating answer...
-                </p>
-              ) : null}
-              {item.status === 'done' ? (
-                <p className="question-answer-message question-answer-message-assistant">
-                  <span className="question-answer-message-label">RAG</span>
-                  {item.answer}
-                </p>
-              ) : null}
-              {item.status === 'error' ? (
-                <p className="question-answer-message question-answer-message-error">
-                  <span className="question-answer-message-label">Error</span>
-                  {item.error}
-                </p>
-              ) : null}
-            </article>
-          ))}
-          <div ref={messagesEndRef} />
+            </div>
+          ) : null}
+
+          <div className="question-answer-messages">
+            {exchanges.map((item) => (
+              <article key={item.id} className="question-answer-exchange">
+                <div
+                  className="question-answer-message question-answer-message-user"
+                  aria-label="Your message"
+                >
+                  {item.question}
+                </div>
+                {item.status === 'pending' ? (
+                  <div
+                    className="question-answer-message question-answer-message-assistant question-answer-loading"
+                    aria-busy="true"
+                  >
+                    <span className="question-answer-loading-dots" aria-hidden="true">
+                      <span />
+                      <span />
+                      <span />
+                    </span>
+                    <span className="question-answer-loading-text">Thinking…</span>
+                  </div>
+                ) : null}
+                {item.status === 'done' ? (
+                  <div
+                    className="question-answer-message question-answer-message-assistant"
+                    aria-label="Assistant response"
+                  >
+                    {item.answer}
+                  </div>
+                ) : null}
+                {item.status === 'error' ? (
+                  <div
+                    className="question-answer-message question-answer-message-error"
+                    role="alert"
+                  >
+                    {item.error}
+                  </div>
+                ) : null}
+              </article>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
         </div>
       </div>
-      <div className="question-answer-panel">
-        <form className="question-answer-form cyber-chamfer" onSubmit={handleSubmit}>
-          <input
+
+      <div className="question-answer-composer">
+        <form className="question-answer-form" onSubmit={handleSubmit}>
+          <textarea
+            ref={textareaRef}
             className="question-answer-input"
-            type="text"
-            placeholder="Enter your question"
+            placeholder="Ask a question about your documents..."
             name="question"
+            rows={1}
             disabled={loading}
+            onInput={resizeTextarea}
+            onKeyDown={handleKeyDown}
           />
           <button
             type="submit"
-            className="question-answer-submit cyber-btn cyber-btn-solid cyber-chamfer-sm"
+            className="question-answer-submit"
             disabled={loading}
+            aria-label={loading ? 'Sending question' : 'Send question'}
           >
-            {loading ? 'Asking...' : 'Ask'}
+            <IconSend width={18} height={18} />
           </button>
         </form>
+        <p className="question-answer-composer-hint">
+          Press Enter to send, Shift+Enter for a new line
+        </p>
       </div>
-    </div>
+    </main>
   )
 }
 
