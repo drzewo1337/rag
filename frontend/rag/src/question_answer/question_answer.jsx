@@ -2,6 +2,7 @@ import './question_answer.css'
 import { useEffect, useRef, useState } from 'react'
 import { askQuestionAndWaitForAnswer } from '../api/askApi'
 import { IconPanelLeft, IconSend } from '../icons'
+import AnswerMessage from './answer'
 
 function QuestionAnswerApp({ onOpenSidebar }) {
   const [exchanges, setExchanges] = useState([])
@@ -128,7 +129,7 @@ function QuestionAnswerApp({ onOpenSidebar }) {
                     className="question-answer-message question-answer-message-assistant"
                     aria-label="Assistant response"
                   >
-                    {item.answer}
+                    <AnswerMessage text={item.answer} exchangeId={item.id} />
                   </div>
                 ) : null}
                 {item.status === 'error' ? (

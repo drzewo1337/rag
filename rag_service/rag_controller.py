@@ -46,5 +46,4 @@ async def health_check():
 @app.post("/answer")
 async def answer_debug(body: AnswerRequest):
     """Synchronous debug endpoint — production flow uses the questions queue."""
-    text = generate_answer(body.question_text)
-    return {"answer": text}
+    return generate_answer(body.question_text)
