@@ -6,14 +6,33 @@ from facts_service.dataset_loader import load_dataset
 from embedding.embedding import embed
 from facts_service import models
 from facts_service.database import SessionLocal, engine
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from datetime import datetime
+
+
+def prepare_facts_table():
+    with engine.begin() as conn:
+        conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+        column_type = conn.execute(text(
+            """
+            SELECT udt_name
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+              AND table_name = 'facts'
+              AND column_name = 'embedding'
+            """
+        )).scalar()
+        if column_type is not None and column_type != "vector":
+            print("Kolumna embedding nie jest typu vector — odtwarzam tabelę facts")
+            conn.execute(text("DROP TABLE facts"))
+    models.Base.metadata.create_all(bind=engine)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Aplikacja startuje: inicjalizacja zasobów")
-    models.Base.metadata.create_all(bind=engine)
+    prepare_facts_table()
     with SessionLocal() as db:
         if db.query(models.Facts).count() > 0:
             print("Fakty już są w bazie — pomijam bootstrap")
@@ -21,7 +40,7 @@ async def lifespan(app: FastAPI):
             dataset = load_dataset()
             for fact in dataset:
                 embedding = embed(fact)
-                db_fact = models.Facts(fact_text=fact, embedding=str(embedding), created_at=datetime.now())
+                db_fact = models.Facts(fact_text=fact, embedding=embedding, created_at=datetime.now())
                 db.add(db_fact)
                 db.commit()
             print("Wczytano fakty do bazy danych")
