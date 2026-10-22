@@ -174,7 +174,7 @@ services:
       interval: 10s
       timeout: 60s
       retries: 30
-      start_period: 300s
+      start_period: 15s
     networks: 
       - rag_service_network
 

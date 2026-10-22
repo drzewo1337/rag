@@ -11,6 +11,13 @@ async function parseJsonResponse(response) {
   }
 }
 
+function errorDetail(data, response) {
+  if (typeof data?.detail === 'string') {
+    return data.detail
+  }
+  return `Request failed (${response.status})`
+}
+
 export async function apiRequest(path, options = {}) {
   const response = await fetch(path, {
     headers: {
@@ -23,11 +30,22 @@ export async function apiRequest(path, options = {}) {
   const data = await parseJsonResponse(response)
 
   if (!response.ok) {
-    const detail =
-      typeof data?.detail === 'string'
-        ? data.detail
-        : `Request failed (${response.status})`
-    throw new Error(detail)
+    throw new Error(errorDetail(data, response))
+  }
+
+  return data
+}
+
+export async function apiUpload(path, formData) {
+  const response = await fetch(path, {
+    method: 'POST',
+    body: formData,
+  })
+
+  const data = await parseJsonResponse(response)
+
+  if (!response.ok) {
+    throw new Error(errorDetail(data, response))
   }
 
   return data
