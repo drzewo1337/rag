@@ -37,8 +37,7 @@ function App() {
               <IconLeaf width={22} height={22} />
             </span>
             <div className="app-sidebar-brand-text">
-              <span className="app-sidebar-title">RAG Knowledge</span>
-              <span className="app-sidebar-subtitle">Document assistant</span>
+              <span className="app-sidebar-title">RAG</span>
             </div>
           </div>
           <FactsApp />
