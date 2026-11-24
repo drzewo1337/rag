@@ -13,7 +13,7 @@ configs:
 
 services:
   database:
-    image: postgres:17-alpine
+    image: pgvector/pgvector:pg17
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -174,7 +174,7 @@ services:
       interval: 10s
       timeout: 60s
       retries: 30
-      start_period: 300s
+      start_period: 15s
     networks: 
       - rag_service_network
 
